@@ -1,0 +1,81 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "vpc-cf",
+    "Resources": {
+        "myvpc" : {
+            "Type" : "AWS::EC2::VPC",
+            "Properties" : {
+            "CidrBlock" : "20.40.0.0/16",
+            "EnableDnsSupport" : "true",
+            "EnableDnsHostnames" : "true",
+            "InstanceTenancy" : "default",
+            "Tags" : [ {"Key" : "Name", "Value" : "myvpc"} ]
+               }
+            },
+        "mypublicsubnet": {
+            "Type" : "AWS::EC2::Subnet",
+            "Properties" : {
+               "VpcId" : { "Ref" : "myvpc" },
+               "CidrBlock" : "20.40.1.0/24",
+               "AvailabilityZone" : "us-west-2a",
+               "Tags" : [ { "Key" : "Name", "Value" : "mypublicsubnet" } ]
+            }
+         },
+         "myigw": {
+             "Type" :"AWS::EC2::InternetGateway",
+             "Properties": {
+                 "Tags": [ { "Key" : "Name", "Value" : "myigw" } ]
+             }
+         },
+         "AttachmentGateway": {
+             "Type":"AWS::EC2::VPCGatewayAttachment",
+             "Properties":{
+                 "VpcId":{ "Ref": "myvpc"},
+                 "InternetGatewayId":{ "Ref": "myigw" }
+             }
+                 
+          },
+          "myprivatesubnet": {
+            "Type" : "AWS::EC2::Subnet",
+            "Properties" : {
+               "VpcId" : { "Ref" : "myvpc" },
+               "CidrBlock" : "20.40.2.0/24",
+               "AvailabilityZone" : "us-west-2b",
+               "Tags" : [ { "Key" : "Name", "Value" : "myprivatesubnet" } ]
+            }
+         },
+         "mypublicroutetable": {
+             "Type":"AWS::EC2::RouteTable",
+             "Properties":{
+                 "VpcId":{ "Ref": "myvpc"},
+                 "Tags": [ { "Key" : "Name", "Value" : "mypublicroutetable" } ]
+             }
+         },
+         "Myroute":{
+             "Type":"AWS::EC2::Route",
+             "Properties":{
+                 "RouteTableId":{"Ref": "mypublicroutetable"},
+                 "DestinationCidrBlock" : "0.0.0.0/0",
+                 "GatewayId" : { "Ref" : "myigw" }
+             }
+            }
+
+         },
+    "Outputs": {
+        "VPC": {
+        "Description": "VPC Created with public and private subnet.",
+        "Value": {"Ref": "myvpc" }
+              }
+            }
+
+     
+            
+             }    
+         
+    
+    
+    
+
+    
+
+    
